@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <title>DevChallenge final</title>
+  </head>
+  <body>
+    <div id="app">
+      <div class="track">
+        <div data-bind="template: {name: 'track-template', data: trackLeft}"></div>
+      </div>
+      <div class="master">
+        <h2>Master controlls</h2>
+        <button class="btn btn-default" data-bind="click: play">
+          <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+          Play
+        </button>
+        <button class="btn btn-warning" data-bind="click: pause">
+          <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+          Pause
+        </button>
+        <button class="btn btn-danger" data-bind="click: stop">
+          <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+          Stop
+        </button>
+        <br/>
+        <br/>
+        <div class="form-group">
+          <label>Volume</label>
+          <input type="range" min="0" max="100" data-bind="value: volume" />
+        </div>
+        <div class="well">
+          Click and drag on tack wave to select playable region.
+        </div>
+      </div>
+      <div class="track">
+        <div data-bind="template: {name: 'track-template', data: trackRight}"></div>
+      </div>
+    </div>
+    <div style="display:none">
+        <div id="track-template">
+          <div data-bind="ifnot: loaded">
+            <div class="form-group">
+              <label>Select a track to load </label>
+              <input id="audio_file" type="file" accept="audio/*" data-bind="audioLoader: input"/>
+            </div>
+          </div>
+          <div class="wave" data-bind="waveSurfer: waveSurfer, context: parent.context, destination: parent.destination"></div>
+          <div data-bind="if: loaded">
+            <div class="form-group">
+              <label>Zoom</label>
+              <input id="slider" type="range" min="1" max="100" data-bind="value: zoom" style="width: 100%" />
+            </div>
+            <div class="duration">
+              <span data-bind="text: currentTime"></span>:
+              <span data-bind="text: duration"></span>
+            </div>
+            <div class="buttons">
+              <button class="btn btn-default" data-bind="click: play">
+                <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                Play
+              </button>
+              <button class="btn btn-warning" data-bind="click: pause">
+                <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+                Pause
+              </button>
+              <button class="btn btn-danger" data-bind="click: stop">
+                <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+                Stop
+              </button>
+              <button class="btn btn-default" data-bind="click: rewind">
+                <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+                Rewind
+              </button>
+            </div>
+            <div class="form-group">
+              <label>Volume</label>
+              <input type="range" min="0" max="100" data-bind="value: volume" /><br/>
+            </div>
+            <div class="form-group">
+              <label>Tempo</label>
+              <input type="range" min="0" max="3" step="0.1" data-bind="value: tempo" /><br/>
+            </div>
+            <div class="regions().length > 0">
+              <h4>Playable regions</h4>
+              <ul data-bind="foreach: regions">
+                <li>
+                  <button class="btn btn-default" data-bind="click: $parent.playRegion($data)">
+                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                    Play
+                  </button>
+                  <button class="btn btn-warning" data-bind="click: $parent.stop">
+                    <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+                    Stop
+                  </button>
+                  <button class="btn btn-danger" data-bind="click: $parent.removeRegion($data)">
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    Remove
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <h4>Equalizer</h4>
+            <div class="equalizer" data-bind="foreach: filters">
+              <input class="filter" type="range" min="-40" max="40" orient="vertical" data-bind="value: watcher, attr: {title: frequency.value}">
+            </div>
+            <br/>
+            <div data-ind="if: analyzer">
+              <div data-bind="volumeVisualization: analyzer"></div>
+              <div data-bind="soundVisualization: analyzer"></div>
+            </div>
+          </div>
+        </div>
+        <div id="effect-reverb">
+          <h4>Reverb</h4>
+          The reverb effect allows the sound to be heard with a certain ressonance or repercussion. This simulates a particular physical environment in which the sound could be played (e.g., an auditorium, a concert hall, etc).
+          <label>
+              Time
+              <i class="hint">Duration of impulse, in seconds</i>
+          </label>
+          <input type="range" min="0.0001" max="10" step="0.001" data-bind="value: time" /><br/>
+          <br/>
+          <label>
+              Decay
+              <i class="hint">The rate for the reflections of sound to fade away</i>
+          </label>
+          <input type="range" min="0" max="10" step="0.01" data-bind="value: decay" /><br/>
+          <br/>
+          <label>
+              Reverse
+              <i class="hint">Whether or not to reverse the impulse shape</i>
+          </label>
+          <input type="checkbox" value="1" data-bind="checked: reverse" /><br/>
+          <br/>
+          <label>
+              Mix
+              <i class="hint">Volume balance between the original audio and the effected output</i>
+          </label>
+          <input type="range" min="0" max="1" step="0.1" data-bind="value: mix" /><br/>
+          <br/>
+          <button data-bind="click: $parents[1].removeEffect">Remove</button>
+        </div>
+        <div id="effect-reverb">
+          <h4>Delay</h4>
+          The delay effect plays back the sound a certain number of times in defined intervals, giving the impression of an echo.
+
+          <label>
+              Feedback
+              <i class="hint">The intensity with which the input will echo back. A larger value will result in more echo repetitions.</i>
+          </label>
+          <input type="range" min="0" max="1" step="0.1" data-bind="value: feedback" /><br/>
+          <br/>
+          <label>
+              Time
+              <i class="hint">Interval time in seconds</i>
+          </label>
+          <input type="range" min="0" max="180" step="0.1" data-bind="value: time" /><br/>
+          <br/>
+          <label>
+              Mix
+              <i class="hint">Volume balance between the original audio and the effected output</i>
+          </label>
+          <input type="range" min="0" max="1" step="0.1" data-bind="value: mix" /><br/>
+          <br/>
+          <button data-bind="click: $parents[1].removeEffect">Remove</button>
+        </div>
+      </div>
+  </body>
+</html>

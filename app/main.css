@@ -1,0 +1,21 @@
+#app {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.master, .track {
+  width: 30%;
+  padding: 10px;
+}
+.equalizer {
+  display: flex;
+}
+.equalizer .filter {
+  display: inline-block;
+  -webkit-appearance: slider-vertical;
+  width: 30px;
+  height: 150px;
+}
+.duration {
+  text-align: center;
+}
